@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/gh/logspace-ai/langflow-embedded-chat@main/dist/build/static/js/bundle.min.js"></script>
+
+    <!-- chat_inputs: Stringified JSON with all the input keys and its values. The value of the key that is defined
+    as chat_input_field will be overwritten by the chat message.
+    chat_input_field: Input key that you want the chat to send the user message with. -->
+    <langflow-chat
+      window_title="OpenAI Multi Functions Agent"
+      flow_id="de0d17f1-715c-439c-87d9-a815d13f54e0"
+      chat_inputs='{"input":""}'
+      chat_input_field="input"
+      host_url="http://localhost:7860"
+      chat_position="bottom-right"
+
+    ></langflow-chat>
+</body>
+</html>

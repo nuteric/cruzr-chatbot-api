@@ -1,0 +1,220 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "OpenAI Integration API",
+      "version": "1.0.0",
+      "description": "API for integrating with OpenAI services."
+    },
+    "servers": [
+      {
+        "url": "https://b8cb-175-176-38-130.ngrok-free.app",
+        "description": "Development server"
+      }
+    ],
+    "paths": {
+      "/oauth/callback": {
+        "get": {
+          "summary": "OAuth Callback Endpoint",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/test": {
+        "get": {
+          "summary": "Test Endpoint",
+          "responses": {
+            "200": {
+              "description": "Successful GET response"
+            }
+          }
+        }
+      },
+      "/create-thread": {
+        "post": {
+          "summary": "Create a new thread",
+          "responses": {
+            "200": {
+              "description": "Thread created successfully"
+            },
+            "500": {
+              "description": "Error interacting with OpenAI API"
+            }
+          }
+        }
+      },
+      "/add-thread-message": {
+        "post": {
+          "summary": "Add a message to a thread",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "thread_id": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["thread_id", "message"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Message added successfully"
+            },
+            "400": {
+              "description": "Thread ID is required"
+            },
+            "500": {
+              "description": "Error interacting with OpenAI API"
+            }
+          }
+        }
+      },
+      "/get-thread-messages": {
+        "get": {
+          "summary": "Get messages from a thread",
+          "parameters": [
+            {
+              "name": "thread_id",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Messages retrieved successfully"
+            },
+            "400": {
+              "description": "Thread ID is required"
+            },
+            "500": {
+              "description": "Error interacting with OpenAI API"
+            }
+          }
+        }
+      },
+      "/create-run": {
+        "post": {
+          "summary": "Create a new run for a thread",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "thread_id": {
+                      "type": "string"
+                    },
+                    "assistant_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["thread_id", "assistant_id"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Run created successfully"
+            },
+            "400": {
+              "description": "Thread ID or Assistant ID is required"
+            },
+            "500": {
+              "description": "Error interacting with OpenAI API"
+            }
+          }
+        }
+      },
+      "/retrieve-run": {
+        "get": {
+          "summary": "Retrieve a run",
+          "parameters": [
+            {
+              "name": "thread_id",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "run_id",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Run retrieved successfully"
+            },
+            "400": {
+              "description": "Thread ID and Run ID are required"
+            },
+            "500": {
+              "description": "Error interacting with OpenAI API"
+            }
+          }
+        }
+      },
+      "/submit-function-outputs": {
+        "post": {
+          "summary": "Submit function outputs for a run",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "thread_id": {
+                      "type": "string"
+                    },
+                    "run_id": {
+                      "type": "string"
+                    },
+                    "tool_call_id": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["thread_id", "run_id", "tool_call_id", "output"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Function outputs submitted successfully"
+            },
+            "400": {
+              "description": "Required information is missing"
+            },
+            "500": {
+              "description": "Error interacting with OpenAI API"
+            }
+          }
+        }
+      }
+    }
+  }
