@@ -85,3 +85,26 @@ def send_booking_email_confirmation():
     }
 
     return jsonify(test_response)
+
+@hubspot.route('/search-contact', methods=['POST'])
+def search_contact():
+    email = request.json.get('email')
+
+    print(email)
+
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+
+    response = requests.post(
+        'https://api.hubapi.com/crm/v3/objects/contacts/search',
+        json={'query': email},
+        headers={
+            'Authorization': 'Bearer ' + access_token,
+            'Content-Type': 'application/json'
+        }
+    )
+
+    if response.status_code != 200:
+        return jsonify({'error': 'Error searching contact'}), 500
+
+    return jsonify(response.json())
