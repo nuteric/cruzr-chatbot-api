@@ -1,7 +1,7 @@
 
 import json
 from actions.hubspot import check_order_status, create_new_contact_if_not_found, get_available_appointment_slots, reschedule_telemed_appointment, retrieve_telemed_appointment_details, search_hubspot_contact_by_email, verify_contact_identity
-from actions.openai import add_thread_message, create_run, get_thread_last_message, retrieve_run
+from actions.openai import add_thread_message, create_run, get_thread_last_message, retrieve_run, submit_function_outputs
 
 
 def execute_action(thread_id, run_id, action):
@@ -13,45 +13,44 @@ def execute_action(thread_id, run_id, action):
         return {'error': 'action is required'}
 
 
-    json_string = action.function.arguments
+    json_string = action['function']['arguments']
     arguments = json.loads(json_string)
 
     result = None
 
-    if(action.function.name == "handoff_to_human_agent"):
+    if(action["function"]["name"] == "handoff_to_human_agent"):
          #handoff_to_human_agent
-         result = ""
-    if(action.function.name == "retrieve_telemed_appointment_details"):
+         result = "handed to Kristoff Abellera"
+    if(action["function"]["name"] == "retrieve_telemed_appointment_details"):
          #retrieve_telemed_appointment_details
-         result = retrieve_telemed_appointment_details(arguments.email, arguments.firstname, arguments.lastname)
-    if(action.function.name == "search_hubspot_contact_by_email"):
+         result = retrieve_telemed_appointment_details(arguments["email"], arguments["firstname"], arguments["lastname"])
+    if(action["function"]["name"] == "search_hubspot_contact_by_email"):
          #search_hubspot_contact_by_email
-         result = search_hubspot_contact_by_email(arguments.email)
-    if(action.function.name == "verify_contact_identity"):
+         result = search_hubspot_contact_by_email(arguments["email"])
+    if(action["function"]["name"] == "verify_contact_identity"):
          #verify_contact_identity
-         result = verify_contact_identity(arguments.email, arguments.firstname, arguments.lastname)
-    if(action.function.name == "create_new_contact_if_not_found"):
+         result = verify_contact_identity(arguments["email"], arguments["firstname"], arguments["lastname"])
+    if(action["function"]["name"] == "create_new_contact_if_not_found"):
          #create_new_contact_if_not_found
-         result = create_new_contact_if_not_found(arguments.email, arguments.firstname, arguments.lastname)
-    if(action.function.name == "reschedule_telemed_appointment"):
+         result = create_new_contact_if_not_found(arguments["email"], arguments["firstname"], arguments["lastname"])
+    if(action["function"]["name"] == "reschedule_telemed_appointment"):
          #reschedule_telemed_appointment
-         result = reschedule_telemed_appointment(arguments.email, arguments.firstname, arguments.lastname, arguments.date, arguments.time, arguments.service, arguments.practitioner, arguments.location, arguments.phone)
-    if(action.function.name == "get_available_appointment_slots"):
+         result = reschedule_telemed_appointment(arguments["email"], arguments["firstname"], arguments["lastname"], arguments["date"], arguments["time"], arguments["service"], arguments["practitioner"], arguments["location"], arguments["phone"])
+    if(action["function"]["name"] == "get_available_appointment_slots"):
          #get_available_appointment_slots
          result = get_available_appointment_slots()
-    if(action.function.name == "check_order_status"):
+    if(action["function"]["name"] == "check_order_status"):
          #check_order_status
-         result = check_order_status(arguments.order_id)
+         result = check_order_status(arguments["order_id"])
 
 
 
-
-    return {
-            'thread_id': thread_id,
-            'run_id': run_id,
-            'tool_call_id': action.id,
+    output = {
+            'tool_call_id': action["id"],
             'output': result
          }
+
+    return  output
 
 
 def create_run_and_get_last_message(thread_id,assistant_id):
@@ -66,6 +65,15 @@ def create_run_and_get_last_message(thread_id,assistant_id):
     retrieve_run_response_json = retrieve_run_response.json
 
     while retrieve_run_response_json['status'] != 'completed':
+        if retrieve_run_response_json['status'] == 'requires_action':
+            required_action = retrieve_run_response_json['required_action']
+            tool_calls = required_action['submit_tool_outputs']['tool_calls']
+            tool_call_outputs = []
+            for tool_call in tool_calls:
+                tool_call_output = execute_action(thread_id,run_id,tool_call)
+                tool_call_outputs.append(tool_call_output)
+            submit_function_outputs(thread_id,run_id,tool_call_outputs)
+
         retrieve_run_response = retrieve_run(thread_id,run_id)
         retrieve_run_response_json = retrieve_run_response.json
 

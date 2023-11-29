@@ -1,10 +1,23 @@
 from flask import Blueprint, request, jsonify
 import os
-from actions.openai import add_thread_message, get_thread_messages
+from actions.openai import add_thread_message, create_thread, get_thread_messages
 from tools.openai import create_run_and_get_last_message
 
 assistant_id = os.getenv('VITALITY_RX_OPENAI_ASSISTANT_ID')
 chat = Blueprint('chat', __name__)
+
+
+@chat.route('/start', methods=['POST'])
+def start():
+    create_thread_response = create_thread()
+    create_thread_response_json = create_thread_response.json
+    thread_id = create_thread_response_json['id']
+
+    add_thread_message(thread_id, "hi")
+
+    last_message = create_run_and_get_last_message(thread_id,assistant_id)
+
+    return last_message
 
 @chat.route('/', methods=['GET'])
 def get_chat():
