@@ -1,28 +1,18 @@
 from flask import Blueprint, request, jsonify
 import os
 import requests
+import json
+
+from actions.hubspot import search_hubspot_contact_by_email, verify_contact_identity, create_new_contact_if_not_found, reschedule_telemed_appointment, get_available_appointment_slots, check_order_status, retrieve_telemed_appointment_details
 
 openai = Blueprint('openai', __name__)
 
-thread_id = None
-
 api_key = os.getenv('VITALITY_RX_OPENAI_API_KEY')
 
-def set_thread_id(id):
-    global thread_id
-    thread_id = id
-
-def get_thread_id():
-    global thread_id
-    return thread_id
 
 
-@openai.route('/create-thread', methods=['POST'])
+
 def create_thread():
-
-    print("api_key: " + api_key)
-
-
     response = requests.post(
         'https://api.openai.com/v1/threads',
         headers={'Authorization': 'Bearer ' + api_key, 'Content-Type': 'application/json', 'OpenAI-Beta':'assistants=v1'}
@@ -31,23 +21,14 @@ def create_thread():
     if response.status_code != 200:
         return jsonify({'error': 'Error interacting with OpenAI API'}), 500
 
-    print(response.json()['id'])
-    set_thread_id(response.json()['id'])
-
     return jsonify(response.json())
 
-@openai.route('/add-thread-message', methods=['POST'])
-def add_thread_message():
-
-    print("api_key: " + api_key)
-
-    thread_id = request.json.get('thread_id')
-    message = request.json.get('message')
-
-    print(thread_id)
+def add_thread_message(thread_id, message):
 
     if not thread_id:
         return jsonify({'error': 'Thread ID is required'}), 400
+    if not message:
+        return jsonify({'error': 'Message is required'}), 400
 
     response = requests.post(
         'https://api.openai.com/v1/threads/'+ thread_id +'/messages',
@@ -56,15 +37,11 @@ def add_thread_message():
     )
 
     if response.status_code != 200:
-        print(response.json())
         return jsonify({'error': 'Error interacting with OpenAI API'}), 500
 
     return jsonify(response.json())
 
-@openai.route('/get-thread-messages', methods=['GET'])
-def get_thread_messages():
-
-    thread_id = request.args.get('thread_id')
+def get_thread_messages(thread_id):
 
     if not thread_id:
         return jsonify({'error': 'Thread ID is required'}), 400
@@ -75,21 +52,29 @@ def get_thread_messages():
     )
 
     if response.status_code != 200:
-        print(response.json())
         return jsonify({'error': 'Error interacting with OpenAI API'}), 500
 
     return jsonify(response.json())
 
-@openai.route('/create-run', methods=['POST'])
-def create_run():
+def get_thread_last_message(thread_id):
 
-    print("api_key: " + api_key)
-    print(request.json)
+    if not thread_id:
+        return jsonify({'error': 'Thread ID is required'}), 400
 
-    thread_id = request.json.get('thread_id')
-    assistant_id = request.json.get('assistant_id')
-    # assistant_id = "asst_vIB1qC7Macce1ujVxKbkwqhq"
-    instructions = request.json.get('instructions')
+    response = requests.get(
+        'https://api.openai.com/v1/threads/'+ thread_id +'/messages',
+        headers={'Authorization': 'Bearer ' + api_key, 'Content-Type': 'application/json', 'OpenAI-Beta':'assistants=v1'},
+    )
+
+    if response.status_code != 200:
+        return jsonify({'error': 'Error interacting with OpenAI API'}), 500
+
+
+    last_message = response.json()['data'][0]
+
+    return jsonify(last_message)
+
+def create_run(thread_id, assistant_id, instructions=None):
 
     if not thread_id:
         return jsonify({'error': 'Thread ID is required'}), 400
@@ -103,16 +88,11 @@ def create_run():
     )
 
     if response.status_code != 200:
-        print(response.json())
         return jsonify({'error': 'Error interacting with OpenAI API'}), 500
 
     return jsonify(response.json())
 
-@openai.route('/retrieve-run', methods=['GET'])
-def retrieve_run():
-
-    thread_id = request.args.get('thread_id')
-    run_id = request.args.get('run_id')
+def retrieve_run(thread_id, run_id):
 
     if not thread_id:
         return jsonify({'error': 'Thread ID is required'}), 400
@@ -125,37 +105,17 @@ def retrieve_run():
     )
 
     if response.status_code != 200:
-        print(response.json())
         return jsonify({'error': 'Error interacting with OpenAI API'}), 500
-
-    print(response.json().get('required_action'))
-
 
     return jsonify(response.json())
 
-@openai.route('/submit-function-outputs', methods=['POST'])
-def submit_function_outputs():
-
-    thread_id = request.json.get('thread_id')
-    run_id = request.json.get('run_id')
-    tool_call_id = request.json.get('tool_call_id')
-    output = request.json.get('output')
-
-    tool_outputs = [
-        {
-            "tool_call_id": tool_call_id,
-            "output": output
-        }
-    ]
-
+def submit_function_outputs(thread_id, run_id, tool_outputs):
     if not thread_id:
         return jsonify({'error': 'Thread ID is required'}), 400
     if not run_id:
         return jsonify({'error': 'Run ID is required'}), 400
-    if not tool_call_id:
-        return jsonify({'error': 'Tool Call ID is required'}), 400
-    if not output:
-        return jsonify({'error': 'Output is required'}), 400
+    if not tool_outputs:
+        return jsonify({'error': 'Tool outputs is required'}), 400
 
     response = requests.post(
         'https://api.openai.com/v1/threads/'+ thread_id +'/runs/'+ run_id +"/submit_tool_outputs",
@@ -164,7 +124,7 @@ def submit_function_outputs():
     )
 
     if response.status_code != 200:
-        print(response.json())
         return jsonify({'error': 'Error interacting with OpenAI API'}), 500
 
     return jsonify(response.json())
+
