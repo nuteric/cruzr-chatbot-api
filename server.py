@@ -1,8 +1,7 @@
 
-from flask import Flask, request, redirect
+from flask import Flask
 from flask import jsonify
 from dotenv import load_dotenv
-from actions.openai import add_thread_message, create_run, create_thread, get_thread_last_message, retrieve_run
 
 
 
