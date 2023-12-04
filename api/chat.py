@@ -3,7 +3,7 @@ import os
 from actions.openai import add_thread_message, create_thread, get_thread_messages
 from tools.openai import create_run_and_get_last_message
 
-assistant_id = os.getenv('VITALITY_RX_OPENAI_ASSISTANT_ID')
+assistant_id = os.getenv('CHATBOT_OPENAI_ASSISTANT_ID')
 chat = Blueprint('chat', __name__)
 
 

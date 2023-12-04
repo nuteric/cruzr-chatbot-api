@@ -27,7 +27,7 @@ app.register_blueprint(messenger, url_prefix='/messenger')
 app.register_blueprint(chat, url_prefix='/chat')
 
 
-assistant_id = os.getenv('VITALITY_RX_OPENAI_ASSISTANT_ID')
+assistant_id = os.getenv('CHATBOT_OPENAI_ASSISTANT_ID')
 
 
 @app.route('/test', methods=['GET'])

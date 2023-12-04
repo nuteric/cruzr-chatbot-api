@@ -7,7 +7,7 @@ from actions.hubspot import search_hubspot_contact_by_email, verify_contact_iden
 
 openai = Blueprint('openai', __name__)
 
-api_key = os.getenv('VITALITY_RX_OPENAI_API_KEY')
+api_key = os.getenv('CHATBOT_OPENAI_API_KEY')
 
 
 

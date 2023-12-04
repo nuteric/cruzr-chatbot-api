@@ -2,7 +2,7 @@ import os
 from flask import jsonify
 import requests
 
-access_token = os.getenv('VITALITY_RX_HUBSPOT_ACCESS_TOKEN')
+access_token = os.getenv('CHATBOT_HUBSPOT_ACCESS_TOKEN')
 
 def search_hubspot_contact_by_email(email):
 

@@ -4,8 +4,8 @@ import requests
 
 hubspot = Blueprint('hubspot', __name__)
 
-access_token = os.getenv('VITALITY_RX_HUBSPOT_ACCESS_TOKEN')
-refresh_token = os.getenv('VITALITY_RX_HUBSPOT_REFRESH_TOKEN')
+access_token = os.getenv('CHATBOT_HUBSPOT_ACCESS_TOKEN')
+refresh_token = os.getenv('CHATBOT_HUBSPOT_REFRESH_TOKEN')
 
 @hubspot.route('/oauth/callback', methods=['GET'])
 def oauth_callback():
@@ -14,9 +14,9 @@ def oauth_callback():
     if not code:
         return jsonify({'error': 'Authorization code is required'}), 400
 
-    client_id = os.getenv('VITALITY_RX_HUBSPOT_CLIENT_ID')
-    client_secret = os.getenv('VITALITY_RX_HUBSPOT_CLIENT_SECRET')
-    redirect_uri = os.getenv('VITALITY_RX_HUBSPOT_REDIRECT_URI')
+    client_id = os.getenv('CHATBOT_HUBSPOT_CLIENT_ID')
+    client_secret = os.getenv('CHATBOT_HUBSPOT_CLIENT_SECRET')
+    redirect_uri = os.getenv('CHATBOT_HUBSPOT_REDIRECT_URI')
 
     response = requests.post(
         'https://api.hubapi.com/oauth/v1/token',
