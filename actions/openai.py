@@ -110,6 +110,9 @@ def retrieve_run(thread_id, run_id):
     return jsonify(response.json())
 
 def submit_function_outputs(thread_id, run_id, tool_outputs):
+
+
+    print(tool_outputs)
     if not thread_id:
         return jsonify({'error': 'Thread ID is required'}), 400
     if not run_id:

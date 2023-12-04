@@ -16,6 +16,10 @@ from tools.openai import create_run_and_get_last_message
 
 load_dotenv()
 
+assistant_id = os.getenv('CHATBOT_OPENAI_ASSISTANT_ID')
+server_host = os.getenv('CHATBOT_SERVER_HOST')
+server_port = os.getenv('CHATBOT_SERVER_PORT')
+
 app = Flask(__name__)
 
 app.register_blueprint(hubspot, url_prefix='/hubspot')
@@ -34,4 +38,4 @@ def test():
 
 
 if __name__ == '__main__':
-    app.run(host='localhost' ,debug=True, port=5001)
+    app.run(host=server_host ,debug=True, port=server_port)

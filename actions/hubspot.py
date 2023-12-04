@@ -19,33 +19,37 @@ def search_hubspot_contact_by_email(email):
     )
 
     if response.status_code != 200:
-        return jsonify({'error': 'Error searching contact'}), 500
+        return 'Error searching contact'
 
-    return jsonify(response.json())
+    output = response.json()
 
-def verify_contact_identity(email, firstname, lastname):
+    if output['total'] == 0:
+        return 'Contact not found'
+    output_string = output['results'][0]['properties']['firstname'] +" "+ output['results'][0]['properties']['lastname']
+
+    return output_string
+
+def verify_contact_identity(email, verification_code):
 
     if not email:
-        return jsonify({'error': 'Email is required'}), 400
+        return 'Email is required'
 
-    if not firstname:
-        return jsonify({'error': 'Firstname is required'}), 400
-
-    if not lastname:
-        return jsonify({'error': 'Lastname is required'}), 400
+    if not verification_code:
+        return 'Verification code is required'
 
 
-    return jsonify()
+
+    return "verified"
 
 def create_new_contact_if_not_found(email, firstname, lastname):
     if not email:
-        return jsonify({'error': 'email is required'}), 400
+        return 'email is required'
 
     if not firstname:
-        return jsonify({'error': 'firstname is required'}), 400
+        return 'firstname is required'
 
     if not lastname:
-        return jsonify({'error': 'lastname is required'}), 400
+        return 'lastname is required'
 
     data = {
         'properties': {
@@ -67,7 +71,11 @@ def create_new_contact_if_not_found(email, firstname, lastname):
     if response.status_code != 201:
         return jsonify({'error': 'Error adding contact'}), 500
 
-    return jsonify(response.json())
+    output = response.json()
+    print(output)
+    output_string = output['results'][0]['properties']['firstname'] +" "+ output['results'][0]['properties']['lastname']
+
+    return output_string
 
 def reschedule_telemed_appointment():
     return jsonify()
