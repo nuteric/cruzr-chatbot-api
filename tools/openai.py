@@ -23,7 +23,7 @@ def execute_action(thread_id, run_id, action):
          result = "handed to Kristoff Abellera"
     if(action["function"]["name"] == "retrieve_telemed_appointment_details"):
          #retrieve_telemed_appointment_details
-         #result = retrieve_telemed_appointment_details(arguments["email"], arguments["firstname"], arguments["lastname"])
+         #result = retrieve_telemed_appointment_details(arguments["email"], arguments["first_name"], arguments["last_name"])
          result = "appointment is on Monday at 10 am"
     if(action["function"]["name"] == "search_hubspot_contact_by_email"):
          #search_hubspot_contact_by_email
@@ -33,10 +33,10 @@ def execute_action(thread_id, run_id, action):
          result = verify_contact_identity(arguments["email_address"], arguments["mother_maiden_name"])
     if(action["function"]["name"] == "create_new_contact_if_not_found"):
          #create_new_contact_if_not_found
-         result = create_new_contact_if_not_found(arguments["email_address"], arguments["firstname"], arguments["lastname"])
+         result = create_new_contact_if_not_found(arguments["email_address"], arguments["first_name"], arguments["last_name"])
     if(action["function"]["name"] == "reschedule_telemed_appointment"):
          #reschedule_telemed_appointment
-         #result = reschedule_telemed_appointment(arguments["email"], arguments["firstname"], arguments["lastname"], arguments["date"], arguments["time"], arguments["service"], arguments["practitioner"], arguments["location"], arguments["phone"])
+         #result = reschedule_telemed_appointment(arguments["email"], arguments["first_name"], arguments["last_name"], arguments["date"], arguments["time"], arguments["service"], arguments["practitioner"], arguments["location"], arguments["phone"])
          result = "appointment is rescheduled to Tuesday at 11 am"
     if(action["function"]["name"] == "get_available_appointment_slots"):
          #get_available_appointment_slots

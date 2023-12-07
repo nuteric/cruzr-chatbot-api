@@ -2,10 +2,9 @@ from flask import Blueprint, request, jsonify
 import os
 import requests
 
-hubspot = Blueprint('hubspot', __name__)
+from actions.hubspot import set_tokens
 
-access_token = os.getenv('CHATBOT_HUBSPOT_ACCESS_TOKEN')
-refresh_token = os.getenv('CHATBOT_HUBSPOT_REFRESH_TOKEN')
+hubspot = Blueprint('hubspot', __name__)
 
 @hubspot.route('/oauth/callback', methods=['GET'])
 def oauth_callback():
@@ -34,6 +33,8 @@ def oauth_callback():
 
     access_token = response.json().get('access_token')
     refresh_token = response.json().get('refresh_token')
+
+    set_tokens(access_token, refresh_token)
 
     return jsonify({'access_token': access_token, 'refresh_token': refresh_token})
 

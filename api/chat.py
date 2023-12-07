@@ -9,6 +9,7 @@ chat = Blueprint('chat', __name__)
 
 @chat.route('/start', methods=['POST'])
 def start():
+
     create_thread_response = create_thread()
     create_thread_response_json = create_thread_response.json
     thread_id = create_thread_response_json['id']

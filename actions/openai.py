@@ -13,6 +13,7 @@ api_key = os.getenv('CHATBOT_OPENAI_API_KEY')
 
 
 def create_thread():
+
     response = requests.post(
         'https://api.openai.com/v1/threads',
         headers={'Authorization': 'Bearer ' + api_key, 'Content-Type': 'application/json', 'OpenAI-Beta':'assistants=v1'}

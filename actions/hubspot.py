@@ -2,7 +2,21 @@ import os
 from flask import jsonify
 import requests
 
-access_token = os.getenv('CHATBOT_HUBSPOT_ACCESS_TOKEN')
+access_token = None
+refresh_token = None
+
+def set_tokens(access, refresh):
+    global access_token, refresh_token
+    access_token = access
+    refresh_token = refresh
+
+def get_access_token():
+    global access_token
+    return access_token
+
+def get_refresh_token():
+    global refresh_token
+    return refresh_token
 
 def search_hubspot_contact_by_email(email):
 
@@ -41,21 +55,21 @@ def verify_contact_identity(email, verification_code):
 
     return "verified"
 
-def create_new_contact_if_not_found(email, firstname, lastname):
+def create_new_contact_if_not_found(email, first_name, last_name):
     if not email:
         return 'email is required'
 
-    if not firstname:
-        return 'firstname is required'
+    if not first_name:
+        return 'first name is required'
 
-    if not lastname:
-        return 'lastname is required'
+    if not last_name:
+        return 'last name is required'
 
     data = {
         'properties': {
             'email': email,
-            'firstname': firstname,
-            'lastname': lastname
+            'firstname': first_name,
+            'lastname': last_name
         }
     }
 
@@ -72,8 +86,8 @@ def create_new_contact_if_not_found(email, firstname, lastname):
         return jsonify({'error': 'Error adding contact'}), 500
 
     output = response.json()
-    print(output)
-    output_string = output['results'][0]['properties']['firstname'] +" "+ output['results'][0]['properties']['lastname']
+    print("output: ", output)
+    output_string = output['properties']['firstname'] +" "+ output['properties']['lastname']
 
     return output_string
 
