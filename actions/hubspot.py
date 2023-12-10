@@ -39,7 +39,7 @@ def search_hubspot_contact_by_email(email):
 
     if output['total'] == 0:
         return 'Contact not found'
-    output_string = output['results'][0]['properties']['firstname'] +" "+ output['results'][0]['properties']['lastname']
+    output_string = output['results'][0]['properties']['firstname'] +" "+ output['results'][0]['properties']['lastname'] +" id:"+ output['results'][0]['id']
 
     return output_string
 
@@ -102,3 +102,43 @@ def check_order_status():
 
 def retrieve_telemed_appointment_details():
     return jsonify()
+
+def create_ticket_in_hubspot(customer_id, customer_name, issue_summary):
+    url = "https://api.hubapi.com/crm/v3/objects/tickets"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {access_token}"
+    }
+    data = {
+        "properties": {
+            "hs_pipeline": "69442858",
+            "hs_pipeline_stage": "134696743",
+            "hs_ticket_priority": "HIGH",
+            "content": issue_summary,
+            "subject": f"Handoff {customer_name} to an agent"
+        },
+        "associations": [
+            {
+            "to": {
+                "id": customer_id
+            },
+            "types": [
+                {
+                    "associationCategory": "HUBSPOT_DEFINED",
+                    "associationTypeId": 16
+                }
+            ]
+        }
+        ]
+    }
+
+
+    response = requests.post(url, json=data, headers=headers)
+    output =  response.json()
+
+    print("output: ", output)
+
+    if response.status_code != 201:
+        return 'Error adding ticket'
+
+    return 'Ticket created successfully'

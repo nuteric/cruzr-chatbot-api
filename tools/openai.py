@@ -1,6 +1,6 @@
 
 import json
-from actions.hubspot import check_order_status, create_new_contact_if_not_found, get_available_appointment_slots, reschedule_telemed_appointment, retrieve_telemed_appointment_details, search_hubspot_contact_by_email, verify_contact_identity
+from actions.hubspot import check_order_status, create_new_contact_if_not_found, create_ticket_in_hubspot, get_available_appointment_slots, reschedule_telemed_appointment, retrieve_telemed_appointment_details, search_hubspot_contact_by_email, verify_contact_identity
 from actions.openai import add_thread_message, create_run, get_thread_last_message, retrieve_run, submit_function_outputs
 
 
@@ -18,9 +18,8 @@ def execute_action(thread_id, run_id, action):
 
     result = None
 
-    if(action["function"]["name"] == "handoff_to_human_agent"):
-         #handoff_to_human_agent
-         result = "handed to Kristoff Abellera"
+    if(action["function"]["name"] == "create_ticket_in_hubspot"):
+         result = create_ticket_in_hubspot(arguments["customer_id"], arguments["customer_name"], arguments["issue_summary"])
     if(action["function"]["name"] == "retrieve_telemed_appointment_details"):
          #retrieve_telemed_appointment_details
          #result = retrieve_telemed_appointment_details(arguments["email"], arguments["first_name"], arguments["last_name"])
@@ -73,6 +72,7 @@ def create_run_and_get_last_message(thread_id,assistant_id):
             tool_call_outputs = []
             for tool_call in tool_calls:
                 tool_call_output = execute_action(thread_id,run_id,tool_call)
+                print("tool_call_output: ", tool_call_output)
                 tool_call_outputs.append(tool_call_output)
             submit_function_outputs(thread_id,run_id,tool_call_outputs)
 
