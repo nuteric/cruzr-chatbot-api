@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 
 
 from api.hubspot import hubspot
-from api.messenger import messenger
 from api.chat import chat
 import os
 
@@ -22,7 +21,6 @@ server_port = os.getenv('CHATBOT_SERVER_PORT')
 app = Flask(__name__)
 
 app.register_blueprint(hubspot, url_prefix='/hubspot')
-app.register_blueprint(messenger, url_prefix='/messenger')
 app.register_blueprint(chat, url_prefix='/chat')
 
 
