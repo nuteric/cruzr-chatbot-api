@@ -83,7 +83,7 @@ def create_new_contact_if_not_found(email, first_name, last_name):
     )
 
     if response.status_code != 201:
-        return jsonify({'error': 'Error adding contact'}), 500
+        return  'Error adding contact'
 
     output = response.json()
     print("output: ", output)
